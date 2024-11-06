@@ -1,3 +1,5 @@
+import { CreateUserFormAdmin } from "@/components/create-user-form-admin";
+import { ListUsers } from "@/components/list-users";
 import { LogoutButton } from "@/components/logout";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,23 +27,26 @@ import {
 } from "@/components/ui/sidebar";
 import { auth } from "@/lib/auth";
 import {
-  ChartColumnDecreasingIcon,
   ChevronDownIcon,
+  HomeIcon,
+  ChartColumnDecreasingIcon,
+  Rows2Icon,
+  ListTodoIcon,
   Copy,
   ExternalLink,
-  HomeIcon,
-  ListTodoIcon,
-  Rows2Icon,
 } from "lucide-react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-export default async function Home() {
-  const [session, activeSessions] = await Promise.all([
+export default async function Dashboard() {
+  const [session, activeSessions, organizations] = await Promise.all([
     auth.api.getSession({
       headers: await headers(),
     }),
     auth.api.listSessions({
+      headers: await headers(),
+    }),
+    auth.api.listOrganization({
       headers: await headers(),
     }),
   ]).catch((e) => {
@@ -53,9 +58,9 @@ export default async function Home() {
   if (!session) {
     return <div>Not authenticated</div>;
   }
-
   return (
     <div>
+      <CreateUserFormAdmin />
       <SidebarProvider>
         <Sidebar>
           <SidebarHeader>
@@ -162,6 +167,12 @@ export default async function Home() {
           <pre>{JSON.stringify(session, null, 2)}</pre>
 
           <pre>{JSON.stringify(activeSessions, null, 2)}</pre>
+
+          <pre className="mt-5 bg-red-400">
+            {JSON.stringify(organizations, null, 2)}
+          </pre>
+
+          <ListUsers />
         </main>
       </SidebarProvider>
     </div>
